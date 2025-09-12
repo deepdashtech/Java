@@ -1,0 +1,107 @@
+package com.example.libraryManagement.in.service;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.example.libraryManagement.in.entites.Book;
+import com.example.libraryManagement.in.entites.BorrwedBook;
+import com.example.libraryManagement.in.entites.User;
+import com.example.libraryManagement.in.repository.bookRepository;
+import com.example.libraryManagement.in.repository.borrowedBookRepository;
+import com.example.libraryManagement.in.repository.userRepository;
+
+@Service
+public class BorrowedBookService {
+	
+	@Autowired
+	private borrowedBookRepository borrowRepo;
+	
+	@Autowired
+	private userRepository userRepo;
+	
+	@Autowired
+	private bookRepository bookRepo;
+	
+	public void SaveBorrow(User u, Book b)
+	{
+		borrowRepo.save(new BorrwedBook(u, b));
+	}
+	
+	public void SaveReturn(List<BorrwedBook> borrowed)
+	{
+		borrowRepo.deleteAll(borrowed);
+	}
+	
+	public boolean deleteBorrowedBookByUserIdAndBookId(int userId, int bookId)
+	{
+		int deletedCount = borrowRepo.deleteByUserIdAndBookId(userId, bookId);
+		if(deletedCount > 0)
+		{
+			User user=userRepo.findByUserId(userId);
+			Book book=bookRepo.findByBookId(bookId);
+			
+			user.setBooksBorrowed(user.getBooksBorrowed()-1);
+			userRepo.save(user);
+			
+			book.setNumberOfCopies(book.getNumberOfCopies()+1);
+			bookRepo.save(book);
+//			(userRepo.getById(userId)).setBooksBorrowed(userRepo.getById(userId).getBooksBorrowed()+1);
+//			(bookRepo.getById(bookId)).setNumberOfCopies(bookRepo.getById(bookId).getNumberOfCopies()-1);
+			return true;
+		}
+        return false;
+	}
+	
+	public List<Book> MyBorrowedBooks(int userId)
+	{
+		List<BorrwedBook> borrowed= borrowRepo.findByUserId(userId);		
+		return borrowed.stream().map(BorrwedBook::getBook).collect(Collectors.toList()); 
+	}
+	
+	public boolean BorrowBook(int bookId , int userId) {
+	    System.out.println("Come in borrow service");
+
+	    User user = userRepo.findByUserId(userId);
+	    if (user == null) {
+	        System.out.println("User not found for ID: " + userId);
+	        return false;
+	    }
+
+	    Book book = bookRepo.findByBookId(bookId);
+	    if (book == null) {
+	        System.out.println("Book not found for ID: " + bookId);
+	        return false;
+	    }
+
+	    List<BorrwedBook> borrows = borrowRepo.findByUserAndBook(user, book);
+	    if (borrows != null && !borrows.isEmpty()) {
+	        System.out.println("Already exist");
+	        return false;
+	    }
+
+	    System.out.println("this book user not already exist");
+	    System.out.println("user and book bean getted");
+
+	    if (book.getNumberOfCopies() <= 0) {
+	        System.out.println("book is out of stock");
+	        return false;
+	    }
+
+	    user.setBooksBorrowed(user.getBooksBorrowed() + 1);
+	    userRepo.save(user);
+
+	    book.setNumberOfCopies(book.getNumberOfCopies() - 1);
+	    bookRepo.save(book);
+
+	    borrowRepo.save(new BorrwedBook(user, book));
+	    
+	    System.out.println("user repo and book repo updated");
+	    return true;
+	}
+
+}
