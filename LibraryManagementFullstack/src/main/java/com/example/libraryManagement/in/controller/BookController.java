@@ -1,5 +1,10 @@
 package com.example.libraryManagement.in.controller;
 
+import java.awt.PageAttributes.MediaType;
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +19,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.libraryManagement.in.dto.BookRequest;
 import com.example.libraryManagement.in.entites.Book;
@@ -58,16 +65,45 @@ public class BookController {
 	}
 	
 	
-	@PostMapping("/add")
-	public ResponseEntity<String> addBook(@RequestBody BookRequest bookrequest)
-	{
-		boolean added=bookService.SaveBook(bookrequest.getTitle(), bookrequest.getIsbn(), bookrequest.getNumberOfCopies(),bookrequest.getAuthor());
-		
-		if (added) {
-			return ResponseEntity.ok("Added Successfully");
-		}
-		return ResponseEntity.status(401).body("Already Exists");
+	@PostMapping(value =  "/add", consumes = org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseEntity<String> addBook(@RequestPart("book") BookRequest bookrequest,
+	                                      @RequestPart("image") MultipartFile imagefile) {
+	    String fileName = null;
+	    try {
+	        String uploadDir = "uploads/books/";
+	        Path uploadPath = Paths.get(uploadDir).toAbsolutePath().normalize();
+
+	        if (!Files.exists(uploadPath)) {
+	            Files.createDirectories(uploadPath);
+	        }
+
+	        String originalFilename = imagefile.getOriginalFilename();
+	        String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+	        fileName = "Book_ISBN_" +bookrequest.getIsbn()+ extension;
+
+	        Path filePath = uploadPath.resolve(fileName);
+	        imagefile.transferTo(filePath.toFile());
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+	            .body("Failed to upload image: " + e.getMessage());
+	    }
+
+	    boolean added = bookService.SaveBook(
+	            bookrequest.getTitle(),
+	            bookrequest.getIsbn(),
+	            bookrequest.getNumberOfCopies(),
+	            bookrequest.getAuthor(),
+	            "/uploads/books/" + fileName);
+
+	    if (added) {
+	        return ResponseEntity.ok("Added Successfully");
+	    }
+	    return ResponseEntity.status(HttpStatus.CONFLICT).body("Book Already Exists");
 	}
+
+
 	
 	@DeleteMapping("/{id}")
 	public ResponseEntity<String> deleteBook(@PathVariable int id)

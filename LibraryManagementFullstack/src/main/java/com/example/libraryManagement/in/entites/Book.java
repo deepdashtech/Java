@@ -47,13 +47,14 @@ public class Book {
 		// TODO Auto-generated constructor stub
 	}
 	
-	public Book(String title, String isbn, int NumberOfCopies,String author) {
+	public Book(String title, String isbn, int NumberOfCopies,String author, String filepath) {
 		
 		this.isbn=isbn;
 		this.title=title;
 		this.NumberOfCopies=NumberOfCopies;
 		this.author=author;
 		totalCopies=NumberOfCopies;
+		imagePath=filepath;
 		// TODO Auto-generated constructor stub
 	}
 
