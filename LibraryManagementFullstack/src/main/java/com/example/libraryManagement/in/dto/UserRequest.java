@@ -1,6 +1,6 @@
 package com.example.libraryManagement.in.dto;
 
-public class SignupRequest {
+public class UserRequest {
 	private String username;
 	private String password;
 	private String usertype;

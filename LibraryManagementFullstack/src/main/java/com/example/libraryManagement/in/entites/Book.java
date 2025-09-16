@@ -28,12 +28,21 @@ public class Book {
 	private int NumberOfCopies;
 	
 	@Column
+	private int totalCopies;
+	
+
+	@Column
 	private String author;
 	
 	@Column
 	@CreationTimestamp
 	private LocalDateTime createdOn;
 	
+	
+	@Column
+	private String imagePath;	
+	
+
 	public Book() {
 		// TODO Auto-generated constructor stub
 	}
@@ -44,6 +53,7 @@ public class Book {
 		this.title=title;
 		this.NumberOfCopies=NumberOfCopies;
 		this.author=author;
+		totalCopies=NumberOfCopies;
 		// TODO Auto-generated constructor stub
 	}
 
@@ -95,6 +105,20 @@ public class Book {
 		this.createdOn = createdOn;
 	}
 	
+	public int getTotalCopies() {
+		return totalCopies;
+	}
+	
+	public void setTotalCopies(int totalCopies) {
+		this.totalCopies = totalCopies;
+	}
 
+	public String getImagePath() {
+		return imagePath;
+	}
+	
+	public void setImagePath(String imagePath) {
+		this.imagePath = imagePath;
+	}
 	
 }

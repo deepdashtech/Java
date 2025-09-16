@@ -1,5 +1,6 @@
 package com.example.libraryManagement.in.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collector;
@@ -37,30 +38,48 @@ public class BorrowedBookService {
 		borrowRepo.deleteAll(borrowed);
 	}
 	
-	public boolean deleteBorrowedBookByUserIdAndBookId(int userId, int bookId)
+	public boolean ReturnBorrowedBookByUserIdAndBookId(int userId, int bookId)
 	{
-		int deletedCount = borrowRepo.deleteByUserIdAndBookId(userId, bookId);
-		if(deletedCount > 0)
+		BorrwedBook borrowedbook = borrowRepo.findByUser_UserIdAndBook_BookIdAndReturnDateIsNull(userId, bookId);
+		if(borrowedbook == null)
 		{
-			User user=userRepo.findByUserId(userId);
-			Book book=bookRepo.findByBookId(bookId);
-			
-			user.setBooksBorrowed(user.getBooksBorrowed()-1);
-			userRepo.save(user);
-			
-			book.setNumberOfCopies(book.getNumberOfCopies()+1);
-			bookRepo.save(book);
+			return false;
+		}
+		
+		borrowedbook.getBook().setNumberOfCopies(borrowedbook.getBook().getTotalCopies()+1);
+		
+		borrowedbook.getUser().SetTotalBorrowed(borrowedbook.getUser().getTotalBorrowed()-1);
+		
+		borrowedbook.setReturnDate(LocalDateTime.now());
+				
+		borrowRepo.save(borrowedbook);
+		return true;
+		
+//			User user=userRepo.findByUserId(userId);
+//			Book book=bookRepo.findByBookId(bookId);
+//			
+//			user.setBooksBorrowed(user.getBooksBorrowed()-1);
+//			userRepo.save(user);
+//			
+//			book.setNumberOfCopies(book.getNumberOfCopies()+1);
+//			bookRepo.save(book);
 //			(userRepo.getById(userId)).setBooksBorrowed(userRepo.getById(userId).getBooksBorrowed()+1);
 //			(bookRepo.getById(bookId)).setNumberOfCopies(bookRepo.getById(bookId).getNumberOfCopies()-1);
-			return true;
-		}
-        return false;
+//		}
+//        return false;
 	}
 	
-	public List<Book> MyBorrowedBooks(int userId)
+	public List<BorrwedBook> MyBorrowedBooks(int userId)
 	{
-		List<BorrwedBook> borrowed= borrowRepo.findByUserId(userId);		
-		return borrowed.stream().map(BorrwedBook::getBook).collect(Collectors.toList()); 
+		List<BorrwedBook>  borrowedlistdata=borrowRepo.findByUserId(userId);
+		return borrowedlistdata.stream().filter(element->element.getReturnDate()==null).collect(Collectors.toList());
+//		List<BorrwedBook> borrowed= borrowRepo.f		
+//		return borrowed.stream().map(BorrwedBook::getBook).collect(Collectors.toList()); 
+	}
+	
+	public List<BorrwedBook> getAllHistory(int userId)
+	{
+		return borrowRepo.findByUserId(userId);
 	}
 	
 	public boolean BorrowBook(int bookId , int userId) {
@@ -78,8 +97,8 @@ public class BorrowedBookService {
 	        return false;
 	    }
 
-	    List<BorrwedBook> borrows = borrowRepo.findByUserAndBook(user, book);
-	    if (borrows != null && !borrows.isEmpty()) {
+	    BorrwedBook borrows = borrowRepo.findByUser_UserIdAndBook_BookIdAndReturnDateIsNull(user.getUserId(), book.getBookId());
+	    if (borrows != null) {
 	        System.out.println("Already exist");
 	        return false;
 	    }
@@ -89,7 +108,7 @@ public class BorrowedBookService {
 
 	    if (book.getNumberOfCopies() <= 0) {
 	        System.out.println("book is out of stock");
-	        return false;
+	        return false;	
 	    }
 
 	    user.setBooksBorrowed(user.getBooksBorrowed() + 1);

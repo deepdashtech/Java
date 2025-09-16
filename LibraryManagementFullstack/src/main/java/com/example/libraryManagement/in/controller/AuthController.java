@@ -11,8 +11,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.libraryManagement.in.dto.ApiResponse;
 import com.example.libraryManagement.in.dto.LoginRequest;
-import com.example.libraryManagement.in.dto.SignupRequest;
+import com.example.libraryManagement.in.dto.UserRequest;
+import com.example.libraryManagement.in.dto.UserResponse;
 import com.example.libraryManagement.in.entites.User;
 import com.example.libraryManagement.in.service.UserService;
 
@@ -25,31 +27,36 @@ public class AuthController {
 	private UserService userService;
 	
 	@PostMapping("/login")
-	public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest)
+	public ResponseEntity<ApiResponse<UserResponse>> login(@RequestBody LoginRequest loginRequest)
 	{
-		var user=userService.LoginUser(loginRequest.getUsername(), loginRequest.getPassword(),loginRequest.getUsertype());
+		User user=userService.LoginUser(loginRequest.getUsername(), loginRequest.getPassword(),loginRequest.getUsertype());
 		
 		if (user != null) 
 		{
-			return ResponseEntity.ok(Map.of("success", true,"user", user));
+			UserResponse userResp=new UserResponse(user.getUserId(),user.getUsername(),user.getUserType());
+			ApiResponse<UserResponse> response=new ApiResponse<UserResponse>("success","Login Successful!!", userResp);
+			return ResponseEntity.ok(response);
 		}
-		else {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-	                .body(Map.of("success", false, "message", "Not authorized!!"));
+		else 
+		{
+			ApiResponse<UserResponse> response=new ApiResponse<UserResponse>("failed","Not Authorized!!", null);
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
 		}
 	}
 	
 	@PostMapping("/signup")
-	public ResponseEntity<?> signup(@RequestBody SignupRequest signupRequest)
+	public ResponseEntity<ApiResponse<UserResponse>> signup(@RequestBody UserRequest signupRequest)
 	{
-		var user=userService.RegisterUser(signupRequest.getUsername(),signupRequest.getPassword(),signupRequest.getUsertype());
+		User user=userService.RegisterUser(signupRequest.getUsername(),signupRequest.getPassword(),signupRequest.getUsertype());
 		if (user != null) 
 		{
-			return ResponseEntity.ok(Map.of("success", true,"user", user));
+			UserResponse userResp=new UserResponse(user.getUserId(),user.getUsername(),user.getUserType());
+			ApiResponse<UserResponse> response=new ApiResponse<UserResponse>("success","Register Successful!!", userResp);
+			return ResponseEntity.ok(response);
 		}
 		else {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-	                .body(Map.of("success", false, "message", "Not Registeres Successfully!!"));
+			ApiResponse<UserResponse> response=new ApiResponse<UserResponse>("failed","Failed To Register", null);
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
 		}
 	}
 }

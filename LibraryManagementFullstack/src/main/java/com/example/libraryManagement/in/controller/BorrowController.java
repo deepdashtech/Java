@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.libraryManagement.in.dto.BorrowRequest;
 import com.example.libraryManagement.in.entites.Book;
+import com.example.libraryManagement.in.entites.BorrwedBook;
 import com.example.libraryManagement.in.service.BorrowedBookService;
 
 @RestController
@@ -46,17 +47,24 @@ public class BorrowController {
 	
 	
 	@GetMapping("/{id}")
-	public List<Book> getAllBorrowed(@PathVariable int id)
+	public List<BorrwedBook> getAllBorrowed(@PathVariable int id)
 	{
 		return borrowService.MyBorrowedBooks(id);
 	}
 	
-	@DeleteMapping("/delete")
-	public ResponseEntity<String> deleteborrow(@RequestParam int userId, @RequestParam int bookId)
+	
+	@GetMapping("/history/{id}")
+	public List<BorrwedBook> getHistory(@PathVariable int id)
 	{
-		boolean deleted = borrowService.deleteBorrowedBookByUserIdAndBookId(userId, bookId);
-        if (deleted) {
-            return ResponseEntity.ok("Borrowed book record deleted successfully");
+		return borrowService.getAllHistory(id);
+	}
+	
+	@GetMapping("/return")
+	public ResponseEntity<String> Returnborrow(@RequestParam int userId, @RequestParam int bookId)
+	{
+		boolean returned = borrowService.ReturnBorrowedBookByUserIdAndBookId(userId, bookId);
+        if (returned) {
+            return ResponseEntity.ok("Book Returned");
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Record not found");
         }

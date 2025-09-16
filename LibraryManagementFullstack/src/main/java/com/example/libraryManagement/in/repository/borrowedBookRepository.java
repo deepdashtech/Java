@@ -18,14 +18,9 @@ import jakarta.transaction.Transactional;
 public interface borrowedBookRepository extends JpaRepository<BorrwedBook, Integer>{
 //		List<BorrwedBook> findByUser(User user);
 		
-		List<BorrwedBook> findByUser_UserId(int userId); 
-		List<BorrwedBook> findByUserAndBook(User user, Book book);
-		List<BorrwedBook> findByUser_UserIdAndBook_BookId(int userId, int bookId);
-		
-		 @Transactional
-		    @Modifying
-		    @Query("DELETE FROM BorrwedBook bb WHERE bb.user.userId = :userId AND bb.book.bookId = :bookId")
-		    int deleteByUserIdAndBookId(@Param("userId") int userId, @Param("bookId") int bookId);
+//		List<BorrwedBook> findByUser_UserId(int userId); 
+		BorrwedBook findByUserAndBook(User user, Book book);
+		BorrwedBook findByUser_UserIdAndBook_BookIdAndReturnDateIsNull(int userId, int bookId);
 		
 		List<BorrwedBook> findByUserId(int userId);
 }
