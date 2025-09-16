@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.libraryManagement.in.dto.ApiResponse;
 import com.example.libraryManagement.in.dto.BorrowRequest;
 import com.example.libraryManagement.in.entites.Book;
 import com.example.libraryManagement.in.entites.BorrwedBook;
@@ -28,46 +29,90 @@ public class BorrowController {
 	private BorrowedBookService borrowService;
 	
 	@PostMapping("/bookborrow")
-	public ResponseEntity<String> borrowBook(@RequestBody BorrowRequest borrowRequest)
-	{
-		System.out.println("come in borrow Controller");
-		
-		System.out.println("userID : "+borrowRequest.getUserId()+" bookId: "+borrowRequest.getBookId());
-		boolean borrowed=borrowService.BorrowBook(borrowRequest.getBookId(), borrowRequest.getUserId());
-				
-		System.out.println("after boolean response");
-		if(borrowed==true)
-		{
-			System.out.println("borrowed successfullt");
-			return ResponseEntity.ok("Book Borrowed Successfully");
-		}
-		System.out.println("can't borrowed");
-		return ResponseEntity.status(401).body("Failed");
+	public ResponseEntity<ApiResponse<String>> borrowBook(@RequestBody BorrowRequest borrowRequest) {
+	    System.out.println("Come in borrow Controller");
+	    System.out.println("userID : " + borrowRequest.getUserId() + " bookId: " + borrowRequest.getBookId());
+
+	    boolean borrowed = borrowService.BorrowBook(borrowRequest.getBookId(), borrowRequest.getUserId());
+
+	    System.out.println("After boolean response");
+
+	    if (borrowed) {
+	        System.out.println("Borrowed successfully");
+
+	        ApiResponse<String> res = new ApiResponse<>(
+	            "success",
+	            "Book Borrowed Successfully",
+	            null
+	        );
+	        return ResponseEntity.ok(res);
+	    }
+
+	    System.out.println("Cannot borrow the book");
+
+	    ApiResponse<String> res = new ApiResponse<>(
+	        "error",
+	        "Failed to borrow book",
+	        null
+	    );
+	    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(res);
 	}
+
 	
 	
 	@GetMapping("/{id}")
-	public List<BorrwedBook> getAllBorrowed(@PathVariable int id)
-	{
-		return borrowService.MyBorrowedBooks(id);
+	public ResponseEntity<ApiResponse<List<BorrwedBook>>> getAllBorrowed(@PathVariable int id) {
+	    List<BorrwedBook> borrowedBooks = borrowService.MyBorrowedBooks(id);
+
+	    ApiResponse<List<BorrwedBook>> res = new ApiResponse<>(
+	        "success",
+	        "Borrowed books fetched successfully",
+	        borrowedBooks
+	    );
+
+	    return ResponseEntity.ok(res);
 	}
+
 	
 	
 	@GetMapping("/history/{id}")
-	public List<BorrwedBook> getHistory(@PathVariable int id)
-	{
-		return borrowService.getAllHistory(id);
+	public ResponseEntity<ApiResponse<List<BorrwedBook>>> getHistory(@PathVariable int id) {
+	    List<BorrwedBook> historyList = borrowService.getAllHistory(id);
+
+	    ApiResponse<List<BorrwedBook>> res = new ApiResponse<>(
+	        "success",
+	        "Borrow history fetched successfully",
+	        historyList
+	    );
+
+	    return ResponseEntity.ok(res);
 	}
+
+	
+	
 	
 	@GetMapping("/return")
-	public ResponseEntity<String> Returnborrow(@RequestParam int userId, @RequestParam int bookId)
-	{
-		boolean returned = borrowService.ReturnBorrowedBookByUserIdAndBookId(userId, bookId);
-        if (returned) {
-            return ResponseEntity.ok("Book Returned");
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Record not found");
-        }
+	public ResponseEntity<ApiResponse<String>> returnBorrow(
+	    @RequestParam int userId,
+	    @RequestParam int bookId) {
 
+	    boolean returned = borrowService.ReturnBorrowedBookByUserIdAndBookId(userId, bookId);
+
+	    if (returned) {
+	        ApiResponse<String> res = new ApiResponse<>(
+	            "success",
+	            "Book returned successfully",
+	            null
+	        );
+	        return ResponseEntity.ok(res);
+	    } else {
+	        ApiResponse<String> res = new ApiResponse<>(
+	            "error",
+	            "Record not found",
+	            null
+	        );
+	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
+	    }
 	}
+
 }

@@ -35,6 +35,7 @@ public class AuthController {
 		{
 			UserResponse userResp=new UserResponse(user.getUserId(),user.getUsername(),user.getUserType());
 			ApiResponse<UserResponse> response=new ApiResponse<UserResponse>("success","Login Successful!!", userResp);
+			System.out.println("Login Successfully");
 			return ResponseEntity.ok(response);
 		}
 		else 

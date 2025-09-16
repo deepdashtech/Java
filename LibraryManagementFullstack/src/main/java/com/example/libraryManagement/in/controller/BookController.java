@@ -1,7 +1,5 @@
 package com.example.libraryManagement.in.controller;
 
-import java.awt.PageAttributes.MediaType;
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -9,7 +7,6 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -23,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.libraryManagement.in.dto.ApiResponse;
 import com.example.libraryManagement.in.dto.BookRequest;
 import com.example.libraryManagement.in.entites.Book;
 import com.example.libraryManagement.in.service.BookService;
@@ -35,39 +33,60 @@ public class BookController {
 	private BookService bookService;
 	
 	@GetMapping("/all")
-	public List<Book> getAllBooks()
-	{
-		return bookService.GetAllBooks();
+	public ResponseEntity<ApiResponse<List<Book>>> getAllBooks() {
+	    List<Book> books = bookService.GetAllBooks();
+
+	    ApiResponse<List<Book>> res = new ApiResponse<>(
+	        "success",
+	        "Books fetched successfully",
+	        books
+	    );
+
+	    return ResponseEntity.ok(res);
 	}
+
 	
 	@GetMapping("/{id}")
-	public ResponseEntity<Book> getBook(@PathVariable int id)
+	public ResponseEntity<ApiResponse<Book>> getBook(@PathVariable int id)
 	{
 		Book book=bookService.SearchBookById(id);
 		
 		if (book!=null) {
-			return ResponseEntity.ok(book);
+			ApiResponse<Book> res=new ApiResponse<Book>("success", "Get Successfully", book);
+			return ResponseEntity.ok(res);  
 		}
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		ApiResponse<Book> res = new ApiResponse<>("error", "Book Not Found", null);
+	    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
 	}
 	
 	
 	@PutMapping("/edit/{id}")
-	public ResponseEntity<String> editBook(@PathVariable int id,@RequestBody BookRequest bookRequest)
-	{
-		boolean updated=bookService.EditBook(id,bookRequest.getTitle(),bookRequest.getIsbn(),bookRequest.getNumberOfCopies());
-		
-		if(updated)
-		{
-			return ResponseEntity.ok("Updated Successfully!!");
-		}
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Book Not Found");
+	public ResponseEntity<ApiResponse<String>> editBook(
+	    @PathVariable int id,
+	    @RequestBody BookRequest bookRequest) {
+
+	    boolean updated = bookService.EditBook(
+	        id,
+	        bookRequest.getTitle(),
+	        bookRequest.getIsbn(),
+	        bookRequest.getNumberOfCopies());
+
+	    if (updated) {
+	        ApiResponse<String> res = new ApiResponse<>("success", "Updated Successfully!!", null);
+	        return ResponseEntity.ok(res);
+	    }
+
+	    ApiResponse<String> res = new ApiResponse<>("error", "Book Not Found", null);
+	    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
 	}
+
 	
 	
-	@PostMapping(value =  "/add", consumes = org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<String> addBook(@RequestPart("book") BookRequest bookrequest,
-	                                      @RequestPart("image") MultipartFile imagefile) {
+	@PostMapping(value = "/add", consumes = org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseEntity<ApiResponse<String>> addBook(
+	    @RequestPart("book") BookRequest bookrequest,
+	    @RequestPart("image") MultipartFile imagefile) {
+
 	    String fileName = null;
 	    try {
 	        String uploadDir = "uploads/books/";
@@ -79,40 +98,59 @@ public class BookController {
 
 	        String originalFilename = imagefile.getOriginalFilename();
 	        String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
-	        fileName = "Book_ISBN_" +bookrequest.getIsbn()+ extension;
+	        fileName = "Book_ISBN_" + bookrequest.getIsbn() + extension;
 
 	        Path filePath = uploadPath.resolve(fileName);
 	        imagefile.transferTo(filePath.toFile());
 
 	    } catch (Exception e) {
 	        e.printStackTrace();
-	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-	            .body("Failed to upload image: " + e.getMessage());
+	        ApiResponse<String> res = new ApiResponse<>(
+	            "error",
+	            "Failed to upload image: " + e.getMessage(),
+	            null
+	        );
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(res);
 	    }
 
 	    boolean added = bookService.SaveBook(
-	            bookrequest.getTitle(),
-	            bookrequest.getIsbn(),
-	            bookrequest.getNumberOfCopies(),
-	            bookrequest.getAuthor(),
-	            "/uploads/books/" + fileName);
+	        bookrequest.getTitle(),
+	        bookrequest.getIsbn(),
+	        bookrequest.getNumberOfCopies(),
+	        bookrequest.getAuthor(),
+	        "/uploads/books/" + fileName);
 
 	    if (added) {
-	        return ResponseEntity.ok("Added Successfully");
+	        ApiResponse<String> res = new ApiResponse<>(
+	            "success",
+	            "Book added successfully",
+	            null
+	        );
+	        return ResponseEntity.ok(res);
 	    }
-	    return ResponseEntity.status(HttpStatus.CONFLICT).body("Book Already Exists");
+
+	    ApiResponse<String> res = new ApiResponse<>(
+	        "error",
+	        "Book Already Exists",
+	        null
+	    );
+	    return ResponseEntity.status(HttpStatus.CONFLICT).body(res);
 	}
+
 
 
 	
 	@DeleteMapping("/{id}")
-	public ResponseEntity<String> deleteBook(@PathVariable int id)
-	{
-		boolean deleted=bookService.DeleteBook(id);
-		if (deleted) {
-			return ResponseEntity.ok("Book Deleted Successfully");
-		}
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Book Not Found");
-		
+	public ResponseEntity<ApiResponse<String>> deleteBook(@PathVariable int id) {
+	    boolean deleted = bookService.DeleteBook(id);
+
+	    if (deleted) {
+	        ApiResponse<String> res = new ApiResponse<>("success", "Book Deleted Successfully", null);
+	        return ResponseEntity.ok(res);
+	    }
+
+	    ApiResponse<String> res = new ApiResponse<>("error", "Book Not Found", null);
+	    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
 	}
+
 }

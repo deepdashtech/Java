@@ -1,5 +1,13 @@
 package com.example.libraryManagement.in.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+//import 
+
+
+@Data
 public class ApiResponse<T> {
 	
 	private String status;
@@ -36,6 +44,7 @@ public class ApiResponse<T> {
 	public void setData(T data) {
 		this.data = data;
 	}
+	
 	
 	
 	
