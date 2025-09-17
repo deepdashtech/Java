@@ -1,11 +1,15 @@
 package com.example.libraryManagement.in.service;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.libraryManagement.in.entites.Book;
 import com.example.libraryManagement.in.repository.bookRepository;
@@ -82,24 +86,45 @@ public class BookService {
 		return bookRepo.findByTitle(title);
 	}
 	
-	public boolean EditBook(int id,String title,String isbn,int copies)
-	{
-		
-		Book book=bookRepo.findByBookId(id);
-		
-		if(book != null)
-		{
-			
-			book.setTitle(title);
-			book.setIsbn(isbn);
-			book.setNumberOfCopies(copies);
-	
-			bookRepo.save(book);
-			return true;
-		}
+	public boolean EditBook(int id, String title, String isbn, int copies, MultipartFile imagefile) {
+	    Book book = bookRepo.findByBookId(id);
 
-		return false;
+	    if (book != null) {
+	        book.setTitle(title);
+	        book.setIsbn(isbn);
+	        book.setNumberOfCopies(copies);
+
+	        // Handle image file update
+	        if (imagefile != null && !imagefile.isEmpty()) {
+	            // Delete old file if it exists
+	            String oldImagePath = book.getImagePath();
+	            if (oldImagePath != null) {
+	                try {
+	                    Path oldPath = Paths.get("").toAbsolutePath().resolve(oldImagePath.replaceFirst("/", ""));
+	                    Files.deleteIfExists(oldPath);
+	                } catch (Exception e) { e.printStackTrace(); }
+	            }
+	            // Save new file
+	            try {
+	                String uploadDir = "uploads/books/";
+	                Path uploadPath = Paths.get(uploadDir).toAbsolutePath().normalize();
+	                if (!Files.exists(uploadPath)) Files.createDirectories(uploadPath);
+
+	                String extension = imagefile.getOriginalFilename()
+	                        .substring(imagefile.getOriginalFilename().lastIndexOf("."));
+	                String fileName = "Book_ISBN_" + isbn + extension;
+	                Path filePath = uploadPath.resolve(fileName);
+	                imagefile.transferTo(filePath.toFile());
+	                book.setImagePath("/uploads/books/" + fileName);
+	            } catch (Exception ex) { ex.printStackTrace(); }
+	        }
+
+	        bookRepo.save(book);
+	        return true;
+	    }
+	    return false;
 	}
+
 	
 	
 	public Book GetBook()

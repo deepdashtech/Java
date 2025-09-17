@@ -60,16 +60,18 @@ public class BookController {
 	}
 	
 	
-	@PutMapping("/edit/{id}")
+	@PutMapping(value = "/edit/{id}", consumes = org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<ApiResponse<String>> editBook(
 	    @PathVariable int id,
-	    @RequestBody BookRequest bookRequest) {
+	    @RequestPart("book") BookRequest bookRequest,
+	    @RequestPart(value = "image", required = false) MultipartFile imagefile) {
 
 	    boolean updated = bookService.EditBook(
 	        id,
 	        bookRequest.getTitle(),
 	        bookRequest.getIsbn(),
-	        bookRequest.getNumberOfCopies());
+	        bookRequest.getNumberOfCopies(),
+	        imagefile);
 
 	    if (updated) {
 	        ApiResponse<String> res = new ApiResponse<>("success", "Updated Successfully!!", null);
@@ -79,7 +81,6 @@ public class BookController {
 	    ApiResponse<String> res = new ApiResponse<>("error", "Book Not Found", null);
 	    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
 	}
-
 	
 	
 	@PostMapping(value = "/add", consumes = org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -142,15 +143,37 @@ public class BookController {
 	
 	@DeleteMapping("/{id}")
 	public ResponseEntity<ApiResponse<String>> deleteBook(@PathVariable int id) {
+	    Book book = bookService.SearchBookById(id);
+
+	    if (book == null) {
+	        ApiResponse<String> res = new ApiResponse<>("error", "Book Not Found", null);
+	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
+	    }
+
+	    // Get photo path from the book object
+	    String photoPath = book.getImagePath(); // e.g. "/uploads/books/Book_ISBN_1234567890.jpg"
+
+	    // Build absolute path to photo file
+	    Path absolutePhotoPath = Paths.get("").toAbsolutePath().resolve(photoPath.replaceFirst("/", ""));
+
+	    boolean imageDeleted = false;
+	    try {
+	        imageDeleted = Files.deleteIfExists(absolutePhotoPath);
+	    } catch (Exception e) {
+	        e.printStackTrace(); // Log deletion error
+	    }
+
+	    // Delete book record from database (consider returning false if actual deletion fails)
 	    boolean deleted = bookService.DeleteBook(id);
 
 	    if (deleted) {
-	        ApiResponse<String> res = new ApiResponse<>("success", "Book Deleted Successfully", null);
+	        String msg = imageDeleted ? "Book and photo deleted successfully" : "Book deleted, but photo was missing";
+	        ApiResponse<String> res = new ApiResponse<>("success", msg, null);
 	        return ResponseEntity.ok(res);
 	    }
-
 	    ApiResponse<String> res = new ApiResponse<>("error", "Book Not Found", null);
 	    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
 	}
+
 
 }

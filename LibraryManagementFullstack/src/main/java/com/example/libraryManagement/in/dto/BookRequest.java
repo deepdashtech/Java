@@ -5,7 +5,7 @@ public class BookRequest {
 	private String title;
 	private String isbn;
 	private int numberOfCopies;
-	protected String author;
+	private String author;
 	
 	public String getTitle() {
 		return title;
