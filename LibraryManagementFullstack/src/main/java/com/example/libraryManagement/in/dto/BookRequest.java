@@ -6,6 +6,7 @@ public class BookRequest {
 	private String isbn;
 	private int numberOfCopies;
 	private String author;
+	private String category;
 	
 	public String getTitle() {
 		return title;
@@ -35,6 +36,12 @@ public class BookRequest {
 	public void setAuthor(String author)
 	{
 		this.author=author;
+	}
+	public String getCategory() {
+		return category;
+	}
+	public void setCategory(String category) {
+		this.category = category;
 	}
 	
 	

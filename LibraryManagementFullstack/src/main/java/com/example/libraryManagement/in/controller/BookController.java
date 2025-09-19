@@ -119,6 +119,7 @@ public class BookController {
 	        bookrequest.getIsbn(),
 	        bookrequest.getNumberOfCopies(),
 	        bookrequest.getAuthor(),
+	        bookrequest.getCategory(),
 	        "/uploads/books/" + fileName);
 
 	    if (added) {

@@ -7,6 +7,8 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.example.libraryManagement.in.entites.Book;
@@ -71,7 +73,7 @@ public class BorrowedBookService {
 	
 	public List<BorrwedBook> MyBorrowedBooks(int userId)
 	{
-		List<BorrwedBook>  borrowedlistdata=borrowRepo.findByUserId(userId);
+		List<BorrwedBook>  borrowedlistdata=borrowRepo.findByUserIdOrderByDueDateDesc(userId);
 		return borrowedlistdata.stream().filter(element->element.getReturnDate()==null).collect(Collectors.toList());
 //		List<BorrwedBook> borrowed= borrowRepo.f		
 //		return borrowed.stream().map(BorrwedBook::getBook).collect(Collectors.toList()); 
@@ -79,7 +81,7 @@ public class BorrowedBookService {
 	
 	public List<BorrwedBook> getAllHistory(int userId)
 	{
-		return borrowRepo.findByUserId(userId);
+		return borrowRepo.findByUserIdOrderByDueDateDesc(userId);
 	}
 	
 	public boolean BorrowBook(int bookId , int userId) {
@@ -121,6 +123,11 @@ public class BorrowedBookService {
 	    
 	    System.out.println("user repo and book repo updated");
 	    return true;
+	}
+	
+	public List<Book> getMostBorrowedBooks()
+	{
+		return borrowRepo.findTopBorrowedBooks();
 	}
 
 }

@@ -72,6 +72,17 @@ public class BorrowController {
 
 	    return ResponseEntity.ok(res);
 	}
+	
+	
+	
+	@GetMapping("/mostBorrowed")
+	public ResponseEntity<ApiResponse<List<Book>>> getMostBorrowedBooks()
+	{
+		List<Book> borrowedBooks=borrowService.getMostBorrowedBooks();
+		
+		ApiResponse<List<Book>> res=new ApiResponse<List<Book>>("success", "Fetched Successfully", borrowedBooks);
+		return ResponseEntity.ok(res);
+	}
 
 	
 	

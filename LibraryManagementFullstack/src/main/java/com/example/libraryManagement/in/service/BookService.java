@@ -22,14 +22,14 @@ public class BookService {
 	@Autowired
 	private bookRepository bookRepo;
 	
-	public Boolean SaveBook(String title,String isbn,int copies,String author,String filepath)
+	public Boolean SaveBook(String title,String isbn,int copies,String author, String category,String filepath)
 	{
 		Book books=bookRepo.findByIsbn(isbn);
 		if (books != null) {
 			return false;
 		}
 		
-		bookRepo.save(new Book(title, isbn, copies,author,filepath));
+		bookRepo.save(new Book(title, isbn, copies,author,category,filepath));
 		return true;
 	}
 	

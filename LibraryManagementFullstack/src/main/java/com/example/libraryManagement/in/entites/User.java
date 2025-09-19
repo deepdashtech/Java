@@ -1,6 +1,9 @@
 package com.example.libraryManagement.in.entites;
 
+import java.time.LocalDateTime;
 import java.util.List;
+
+import org.hibernate.annotations.CreationTimestamp;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
@@ -33,6 +36,13 @@ public class User {
 	@Column
 	private int booksBorrowed=0;
 	
+	@Column
+	@CreationTimestamp
+	private LocalDateTime createdOn;
+	
+	
+
+
 	@OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
 	@JsonBackReference
 	private List<BorrwedBook> borroredBooks;
@@ -98,6 +108,15 @@ public class User {
 
 	public void setUserType(String userType) {
 		this.userType = userType;
+	}
+	
+	public LocalDateTime getCreatedOn() {
+		return createdOn;
+	}
+
+
+	public void setCreatedOn(LocalDateTime createdOn) {
+		this.createdOn = createdOn;
 	}
 
 

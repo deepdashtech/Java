@@ -38,6 +38,9 @@ public class Book {
 	@CreationTimestamp
 	private LocalDateTime createdOn;
 	
+	@Column
+	private String category;
+	
 	
 	@Column
 	private String imagePath;	
@@ -47,13 +50,14 @@ public class Book {
 		// TODO Auto-generated constructor stub
 	}
 	
-	public Book(String title, String isbn, int NumberOfCopies,String author, String filepath) {
+	public Book(String title, String isbn, int NumberOfCopies,String author,String category, String filepath) {
 		
 		this.isbn=isbn;
 		this.title=title;
 		this.NumberOfCopies=NumberOfCopies;
 		this.author=author;
 		totalCopies=NumberOfCopies;
+		this.category=category;
 		imagePath=filepath;
 		// TODO Auto-generated constructor stub
 	}
@@ -120,6 +124,14 @@ public class Book {
 	
 	public void setImagePath(String imagePath) {
 		this.imagePath = imagePath;
+	}
+
+	public String getCategory() {
+		return category;
+	}
+
+	public void setCategory(String category) {
+		this.category = category;
 	}
 	
 }
