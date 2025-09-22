@@ -33,6 +33,11 @@ public class BookService {
 		return true;
 	}
 	
+	public List<Book> newBooks()
+	{
+		return bookRepo.findTop4ByOrderByCreatedOnDesc();
+	}
+	
 	public Book SearchBookById(int id)
 	{
 		return bookRepo.findByBookId(id);

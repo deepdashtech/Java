@@ -44,6 +44,14 @@ public class BookController {
 
 	    return ResponseEntity.ok(res);
 	}
+	
+	@GetMapping("/newlyadded")
+	public ResponseEntity<ApiResponse<List<Book>>> newBooks(){
+		List<Book> newbooks=bookService.newBooks();
+		
+		ApiResponse<List<Book>> res=new ApiResponse<List<Book>>("success", "Books fetched successfully", newbooks);
+		return ResponseEntity.ok(res);
+	}
 
 	
 	@GetMapping("/{id}")
