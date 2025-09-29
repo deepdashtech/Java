@@ -37,9 +37,9 @@ public class UserService {
 	
 	public void DiplayUsers(User user)
 	{
-		System.out.println("\nUsername: "+user.getUsername());
+		System.out.println("\nUsername: "+user.getUserName());
 		System.out.println("\nUser Type: "+user.getUserType());
-		System.out.println("\nTotal Borrowed: "+user.getTotalBorrowed());
+		System.out.println("\nTotal Borrowed: "+user.getBooksBorrowed());
 	}
 	
 	public List<User> DisplayAllUsers()
@@ -119,13 +119,13 @@ public class UserService {
 	
 	public void ReturnupdateQuantity()
 	{
-		LoggedUser.SetTotalBorrowed(LoggedUser.getTotalBorrowed()-1);
+		LoggedUser.setBooksBorrowed(LoggedUser.getBooksBorrowed()-1);
 		userRepo.save(LoggedUser);
 	}
 	
 	public void BorrowupdateQuantity()
 	{
-		LoggedUser.SetTotalBorrowed(LoggedUser.getTotalBorrowed()+1);
+		LoggedUser.setBooksBorrowed((LoggedUser.getBooksBorrowed()+1));
 		userRepo.save(LoggedUser);
 	}
 }

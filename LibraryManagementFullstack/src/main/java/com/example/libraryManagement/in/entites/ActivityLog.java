@@ -8,8 +8,12 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
+@Data
+@NoArgsConstructor
 public class ActivityLog {
 
 	
@@ -37,9 +41,7 @@ public class ActivityLog {
 
     @Column(nullable = false)
     private LocalDateTime timestamp;
-    
-    
-    public ActivityLog() {}
+
     
     public ActivityLog(User user,String action,String entityType, int entityId,String description) 
     {
@@ -50,61 +52,6 @@ public class ActivityLog {
     	this.description=description;
     }
 
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	public User getUser() {
-		return user;
-	}
-
-	public void setUser(User user) {
-		this.user = user;
-	}
-
-	public String getAction() {
-		return action;
-	}
-
-	public void setAction(String action) {
-		this.action = action;
-	}
-
-	public String getEntityType() {
-		return entityType;
-	}
-
-	public void setEntityType(String entityType) {
-		this.entityType = entityType;
-	}
-
-	public int getEntityId() {
-		return entityId;
-	}
-
-	public void setEntityId(int entityId) {
-		this.entityId = entityId;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	public LocalDateTime getTimestamp() {
-		return timestamp;
-	}
-
-	public void setTimestamp(LocalDateTime timestamp) {
-		this.timestamp = timestamp;
-	}
     
     
     

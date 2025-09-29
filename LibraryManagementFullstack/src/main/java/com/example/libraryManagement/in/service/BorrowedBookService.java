@@ -50,7 +50,7 @@ public class BorrowedBookService {
 		
 		borrowedbook.getBook().setNumberOfCopies(borrowedbook.getBook().getTotalCopies()+1);
 		
-		borrowedbook.getUser().SetTotalBorrowed(borrowedbook.getUser().getTotalBorrowed()-1);
+		borrowedbook.getUser().setBooksBorrowed(borrowedbook.getUser().getBooksBorrowed()-1);
 		
 		borrowedbook.setReturnDate(LocalDateTime.now());
 				

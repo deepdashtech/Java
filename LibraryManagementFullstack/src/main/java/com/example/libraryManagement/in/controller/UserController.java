@@ -2,6 +2,8 @@ package com.example.libraryManagement.in.controller;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +25,9 @@ public class UserController {
 	@Autowired
 	private UserService userService;
 	
+
+	private static final Logger logger=LoggerFactory.getLogger(UserController.class);
+	
 	@GetMapping("/all")
 	public ResponseEntity<ApiResponse<List<User>>> getAllUsers() {
 	    List<User> users = userService.DisplayAllUsers();
@@ -32,7 +37,7 @@ public class UserController {
 	        "Users fetched successfully",
 	        users
 	    );
-
+	    logger.info("Users fetched successfully");
 	    return ResponseEntity.ok(res);
 	}
 
@@ -49,7 +54,7 @@ public class UserController {
 	            "User fetched successfully",
 	            user
 	        );
-
+	        logger.info("Users fetched successfully");
 	        return ResponseEntity.ok(res);
 	    }
 
@@ -58,7 +63,7 @@ public class UserController {
 	        "User not found",
 	        null
 	    );
-
+	    logger.info("User not found");
 	    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
 	}
 
@@ -76,7 +81,7 @@ public class UserController {
 	            "User fetched successfully",
 	            user
 	        );
-
+	        logger.info("User fetched successfully");
 	        return ResponseEntity.ok(res);
 	    }
 
@@ -86,6 +91,7 @@ public class UserController {
 	        null
 	    );
 
+	    logger.info("User not found");
 	    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
 	}
 

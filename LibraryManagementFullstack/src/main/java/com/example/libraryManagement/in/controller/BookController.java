@@ -5,6 +5,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +34,8 @@ public class BookController {
 	@Autowired
 	private BookService bookService;
 	
+	private static final Logger logger=LoggerFactory.getLogger(BookController.class);
+	
 	@GetMapping("/all")
 	public ResponseEntity<ApiResponse<List<Book>>> getAllBooks() {
 	    List<Book> books = bookService.GetAllBooks();
@@ -41,7 +45,7 @@ public class BookController {
 	        "Books fetched successfully",
 	        books
 	    );
-
+	    logger.info("returning all books data");
 	    return ResponseEntity.ok(res);
 	}
 	
@@ -50,6 +54,7 @@ public class BookController {
 		List<Book> newbooks=bookService.newBooks();
 		
 		ApiResponse<List<Book>> res=new ApiResponse<List<Book>>("success", "Books fetched successfully", newbooks);
+	    logger.info("returning all newly added books data");
 		return ResponseEntity.ok(res);
 	}
 
@@ -61,8 +66,12 @@ public class BookController {
 		
 		if (book!=null) {
 			ApiResponse<Book> res=new ApiResponse<Book>("success", "Get Successfully", book);
+		    logger.info("returning books data");
 			return ResponseEntity.ok(res);  
 		}
+		
+
+	    logger.info("Failed To Fetch books data");
 		ApiResponse<Book> res = new ApiResponse<>("error", "Book Not Found", null);
 	    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
 	}
@@ -83,10 +92,14 @@ public class BookController {
 
 	    if (updated) {
 	        ApiResponse<String> res = new ApiResponse<>("success", "Updated Successfully!!", null);
+
+		    logger.info("Book Data Edited");
 	        return ResponseEntity.ok(res);
 	    }
 
 	    ApiResponse<String> res = new ApiResponse<>("error", "Book Not Found", null);
+
+	    logger.info("Failed To To Find Book");
 	    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
 	}
 	
@@ -119,6 +132,7 @@ public class BookController {
 	            "Failed to upload image: " + e.getMessage(),
 	            null
 	        );
+		    logger.info("Failed To Edit Data");
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(res);
 	    }
 
@@ -136,6 +150,7 @@ public class BookController {
 	            "Book added successfully",
 	            null
 	        );
+	        logger.info("Book Data Edited");
 	        return ResponseEntity.ok(res);
 	    }
 
@@ -144,6 +159,7 @@ public class BookController {
 	        "Book Already Exists",
 	        null
 	    );
+	    logger.info("Fail to Edit");
 	    return ResponseEntity.status(HttpStatus.CONFLICT).body(res);
 	}
 
@@ -156,6 +172,7 @@ public class BookController {
 
 	    if (book == null) {
 	        ApiResponse<String> res = new ApiResponse<>("error", "Book Not Found", null);
+	        logger.info("Book Not Found");
 	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
 	    }
 
@@ -177,10 +194,12 @@ public class BookController {
 
 	    if (deleted) {
 	        String msg = imageDeleted ? "Book and photo deleted successfully" : "Book deleted, but photo was missing";
+	        logger.info("Book Deleted But Photo is Missing!!");
 	        ApiResponse<String> res = new ApiResponse<>("success", msg, null);
 	        return ResponseEntity.ok(res);
 	    }
 	    ApiResponse<String> res = new ApiResponse<>("error", "Book Not Found", null);
+	    logger.info("Book is Not Found!!");
 	    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
 	}
 

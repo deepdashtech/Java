@@ -2,6 +2,8 @@ package com.example.libraryManagement.in.controller;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +30,8 @@ public class BorrowController {
 	@Autowired
 	private BorrowedBookService borrowService;
 	
+	private static final Logger logger=LoggerFactory.getLogger(BorrowController.class);
+	
 	@PostMapping("/bookborrow")
 	public ResponseEntity<ApiResponse<String>> borrowBook(@RequestBody BorrowRequest borrowRequest) {
 	    System.out.println("Come in borrow Controller");
@@ -45,16 +49,19 @@ public class BorrowController {
 	            "Book Borrowed Successfully",
 	            null
 	        );
+        	logger.info("Borrowed Successfully");
 	        return ResponseEntity.ok(res);
 	    }
 
 	    System.out.println("Cannot borrow the book");
 
+	    
 	    ApiResponse<String> res = new ApiResponse<>(
 	        "error",
 	        "Failed to borrow book",
 	        null
 	    );
+	    logger.info("Failed to borrow book");
 	    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(res);
 	}
 
@@ -69,7 +76,7 @@ public class BorrowController {
 	        "Borrowed books fetched successfully",
 	        borrowedBooks
 	    );
-
+    	logger.info("Borrowed books fetched successfully");
 	    return ResponseEntity.ok(res);
 	}
 	
@@ -81,6 +88,7 @@ public class BorrowController {
 		List<Book> borrowedBooks=borrowService.getMostBorrowedBooks();
 		
 		ApiResponse<List<Book>> res=new ApiResponse<List<Book>>("success", "Fetched Successfully", borrowedBooks);
+		logger.info("Most Borrowed Books Fetched Successfully");
 		return ResponseEntity.ok(res);
 	}
 
@@ -95,7 +103,7 @@ public class BorrowController {
 	        "Borrow history fetched successfully",
 	        historyList
 	    );
-
+	    logger.info("Borrow history fetched successfully");
 	    return ResponseEntity.ok(res);
 	}
 
@@ -115,6 +123,7 @@ public class BorrowController {
 	            "Book returned successfully",
 	            null
 	        );
+	        logger.info("Book returned successfully");
 	        return ResponseEntity.ok(res);
 	    } else {
 	        ApiResponse<String> res = new ApiResponse<>(
@@ -122,6 +131,7 @@ public class BorrowController {
 	            "Record not found",
 	            null
 	        );
+	        logger.info("Record not found");
 	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
 	    }
 	}
