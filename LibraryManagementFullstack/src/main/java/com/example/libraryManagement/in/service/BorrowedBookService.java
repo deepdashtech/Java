@@ -53,6 +53,10 @@ public class BorrowedBookService {
 		borrowedbook.getUser().setBooksBorrowed(borrowedbook.getUser().getBooksBorrowed()-1);
 		
 		borrowedbook.setReturnDate(LocalDateTime.now());
+		
+		borrowedbook.setEditedBy(userId);
+		
+		borrowedbook.setEditedOn(LocalDateTime.now());
 				
 		borrowRepo.save(borrowedbook);
 		return true;
@@ -118,8 +122,10 @@ public class BorrowedBookService {
 
 	    book.setNumberOfCopies(book.getNumberOfCopies() - 1);
 	    bookRepo.save(book);
-
-	    borrowRepo.save(new BorrwedBook(user, book));
+	    
+	    BorrwedBook borrowedBook=new BorrwedBook(user, book);
+	    borrowedBook.setCreatedBy(userId);
+	    borrowRepo.save(borrowedBook);
 	    
 	    System.out.println("user repo and book repo updated");
 	    return true;

@@ -3,6 +3,7 @@ package com.example.libraryManagement.in.service;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
@@ -22,14 +23,16 @@ public class BookService {
 	@Autowired
 	private bookRepository bookRepo;
 	
-	public Boolean SaveBook(String title,String isbn,int copies,String author, String category,String filepath)
+	public Boolean SaveBook(String title,String isbn,int copies,String author, String category, int userId, String filepath)
 	{
 		Book books=bookRepo.findByIsbn(isbn);
 		if (books != null) {
 			return false;
 		}
 		
-		bookRepo.save(new Book(title, isbn, copies,author,category,filepath));
+		Book book= new Book(title, isbn, copies,author,category,filepath);
+		book.setCreatedBy((userId));
+		bookRepo.save(book);
 		return true;
 	}
 	
@@ -91,13 +94,19 @@ public class BookService {
 		return bookRepo.findByTitle(title);
 	}
 	
-	public boolean EditBook(int id, String title, String isbn, int copies, MultipartFile imagefile) {
+	public boolean EditBook(int id, String title, String isbn, int copies,int userID ,MultipartFile imagefile) {
 	    Book book = bookRepo.findByBookId(id);
-
+	    System.out.println();
+	    System.out.println();
+	    System.out.println();
+	    System.out.println("User ID : "+userID);
+	    
 	    if (book != null) {
 	        book.setTitle(title);
 	        book.setIsbn(isbn);
 	        book.setNumberOfCopies(copies);
+	        book.setEditedBy(userID);
+	        book.setEditedOn(LocalDateTime.now());
 
 	        // Handle image file update
 	        if (imagefile != null && !imagefile.isEmpty()) {
@@ -128,9 +137,7 @@ public class BookService {
 	        return true;
 	    }
 	    return false;
-	}
-
-	
+	}	
 	
 	public Book GetBook()
 	{

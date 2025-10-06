@@ -3,16 +3,24 @@ package com.example.libraryManagement.in.entites;
 import java.time.LocalDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
+@Data
+@NoArgsConstructor
 @Table(name = "books")
+@EntityListeners(AuditingEntityListener.class)
 public class Book {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -45,93 +53,31 @@ public class Book {
 	@Column
 	private String imagePath;	
 	
-
-	public Book() {
-		// TODO Auto-generated constructor stub
-	}
 	
-	public Book(String title, String isbn, int NumberOfCopies,String author,String category, String filepath) {
-		
-		this.isbn=isbn;
-		this.title=title;
-		this.NumberOfCopies=NumberOfCopies;
-		this.author=author;
-		totalCopies=NumberOfCopies;
-		this.category=category;
-		imagePath=filepath;
-		// TODO Auto-generated constructor stub
-	}
+		@Column
+	    private Integer createdBy;
 
-	public int getBookId() {
-		return bookId;
-	}
+//	    @Column(updatable = false)
+//	    @CreationTimestamp
+//	    private LocalDateTime createdTime;
 
-	public void setBookId(int bookId) {
-		this.bookId = bookId;
-	}
-
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
-	}
-
-	public String getIsbn() {
-		return isbn;
-	}
-
-	public void setIsbn(String isbn) {
-		this.isbn = isbn;
-	}
-
-	public int getNumberOfCopies() {
-		return NumberOfCopies;
-	}
-
-	public void setNumberOfCopies(int numberOfCopies) {
-		NumberOfCopies = numberOfCopies;
-	}
-
-	public String getAuthor() {
-		return author;
-	}
-
-	public void setAuthor(String author) {
-		this.author = author;
-	}
-
-	public LocalDateTime getCreatedOn() {
-		return createdOn;
-	}
-
-	public void setCreatedOn(LocalDateTime createdOn) {
-		this.createdOn = createdOn;
-	}
-	
-	public int getTotalCopies() {
-		return totalCopies;
-	}
-	
-	public void setTotalCopies(int totalCopies) {
-		this.totalCopies = totalCopies;
-	}
-
-	public String getImagePath() {
-		return imagePath;
-	}
-	
-	public void setImagePath(String imagePath) {
-		this.imagePath = imagePath;
-	}
-
-	public String getCategory() {
-		return category;
-	}
-
-	public void setCategory(String category) {
-		this.category = category;
-	}
+	    @Column
+	    private Integer editedBy;
+	    
+	    
+	    @Column
+	    private LocalDateTime editedOn;
+		    
+	    public Book(String title, String isbn, int NumberOfCopies,String author,String category, String filepath) 
+	    {	
+			this.isbn=isbn;
+			this.title=title;
+			this.NumberOfCopies=NumberOfCopies;
+			this.author=author;
+			totalCopies=NumberOfCopies;
+			this.category=category;
+			imagePath=filepath;
+			// TODO Auto-generated constructor stub
+	    }
 	
 }

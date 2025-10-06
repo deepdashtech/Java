@@ -83,11 +83,15 @@ public class BookController {
 	    @RequestPart("book") BookRequest bookRequest,
 	    @RequestPart(value = "image", required = false) MultipartFile imagefile) {
 
+		
+		logger.info("username :::: "+bookRequest.getUserId());
+		
 	    boolean updated = bookService.EditBook(
 	        id,
 	        bookRequest.getTitle(),
 	        bookRequest.getIsbn(),
 	        bookRequest.getNumberOfCopies(),
+	        bookRequest.getUserId(),
 	        imagefile);
 
 	    if (updated) {
@@ -142,6 +146,7 @@ public class BookController {
 	        bookrequest.getNumberOfCopies(),
 	        bookrequest.getAuthor(),
 	        bookrequest.getCategory(),
+	        bookrequest.getUserId(),
 	        "/uploads/books/" + fileName);
 
 	    if (added) {

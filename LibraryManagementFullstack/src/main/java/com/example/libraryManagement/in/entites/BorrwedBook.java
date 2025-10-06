@@ -15,9 +15,14 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "borrowedbooks")
+@Data
+@NoArgsConstructor
 public class BorrwedBook {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,6 +48,19 @@ public class BorrwedBook {
 	@Column(nullable = true)
 	private LocalDateTime dueDate;
 	
+	@Column
+	@CreationTimestamp
+	private LocalDateTime createdOn;
+	
+	
+	@Column
+    private Integer createdBy;
+	
+	@Column
+    private Integer editedBy;
+
+    @Column
+    private LocalDateTime editedOn;
 	
 	@PrePersist
 	public void onCreate() {
@@ -55,78 +73,13 @@ public class BorrwedBook {
 	@Column
 	private int fineAmount=0;
 	
-	public BorrwedBook(){}
 	
 	public BorrwedBook(User user,Book book) {
 		// TODO Auto-generated constructor stub
 		this.user=user;
 		this.book=book;
 	}
-	
-	
-	
 
-
-	public LocalDateTime getIssueDate() {
-		return issueDate;
-	}
-
-	public void setIssueDate(LocalDateTime issueDate) {
-		this.issueDate = issueDate;
-	}
-
-	public LocalDateTime getReturnDate() {
-		return returnDate;
-	}
-
-	public void setReturnDate(LocalDateTime returnDate) {
-		this.returnDate = returnDate;
-	}
-
-	public LocalDateTime getDueDate() {
-		return dueDate;
-	}
-
-	public void setDueDate(LocalDateTime dueDate) {
-		this.dueDate = dueDate;
-	}
-
-	public int getFineAmount() {
-		return fineAmount;
-	}
-
-	public void setFineAmount(int fineAmount) {
-		this.fineAmount = fineAmount;
-	}
-
-	public int getBorrowID() {
-		return borrowID;
-	}
-
-
-	public void setBorrowID(int borrowID) {
-		this.borrowID = borrowID;
-	}
-
-
-	public User getUser() {
-		return user;
-	}
-
-
-	public void setUser(User user) {
-		this.user = user;
-	}
-
-
-	public Book getBook() {
-		return book;
-	}
-
-
-	public void setBook(Book book) {
-		this.book = book;
-	}
 	
 	
 }

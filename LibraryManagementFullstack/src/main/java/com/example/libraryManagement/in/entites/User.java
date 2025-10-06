@@ -41,6 +41,11 @@ public class User {
 	private LocalDateTime createdOn;
 	
 	
+	@Column
+    private Integer editedBy;
+
+    @Column
+    private LocalDateTime editedTime;
 
 
 	@OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
